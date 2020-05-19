@@ -80,25 +80,28 @@ variance PROC
 	push edx
 
 	;int Variance(int *array, int size, int mean,int *variance)
-	mov edi, [ebp+8]
-	mov esi, 0
-	mov eax, 0			
-	mov ebx, [ebp+16]
+	mov edi, [ebp+8]		; loop initialization : Store array address to edi
+	mov esi, 0				; loop initialization : Select esi as the loop counte and initialize it
+	mov eax, 0				; loop initialization : Select eax as accumulator and initialize it
+	mov ebx, [ebp+16]		; loop initialization : Store the mean value passed as argument to ebx register 
 	jmp cond
 lp:
-	movsx edx, SWORD PTR [edi+esi*2]
-	sub edx,ebx
-	imul edx,edx
-	add eax,edx
-	inc esi
-cond : cmp esi, [ebp+12]
-		jl lp
+	movsx edx, SWORD PTR [edi+esi*2]	;loop body :fetch the array element for current iteration into edx register
+	sub edx,ebx							;loop body :subtract the mean value from the value of the currentl array element
+	imul edx,edx						;loop body :evaluate the square of the difference
+	add eax,edx							;loop body :add the square of difference to the sum of squares of differences
+	inc esi								; step		: increament loop counter
+cond : cmp esi, [ebp+12]	; condition : compare loop counter with the length of the array
+		jl lp				; condition : continue iteration if counter is less than length of array 
 
-	cdq
-	idiv SDWORD PTR [ebp+12]
+	; division : we select the 32-bit version of the idiv instruction i.e. the
+	; one that takes a 32-bit divisor as operand. Thus we will need to use the 
+	; EDX:EAX combination to store the divident
+	cdq							; we sign extend the eax into the edx register
+	idiv SDWORD PTR [ebp+12]	; we execute the 32-bit version of idiv instruction
 
-	mov edi,[ebp+20]
-	mov [edi], eax
+	mov edi,[ebp+20]		; store the address of the pass by reference variable into edi
+	mov [edi], eax			; store the variance value into the address of the pass by reference parameter
 
 	pop edx
 	pop ebx
