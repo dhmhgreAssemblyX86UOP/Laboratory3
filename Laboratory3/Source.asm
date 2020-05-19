@@ -42,22 +42,26 @@ mean PROC
 	push esi
 
 	;int Mean( int *array, int size, int *mean)
-	mov edi, [ebp+8]
-	mov esi, 0
-	mov eax, 0
+	mov edi, [ebp+8]			; loop initialization : Store array address to edi
+	mov esi, 0					; loop initialization : Select esi as the loop counte and initialize it
+	mov eax, 0					; loop initialization : Select eax as accumulator and initialize it
 	jmp cond
 lp: 
-	add ax, [edi + 2*esi]
-	inc esi
-cond: cmp esi, [ebp+12]
-	  jl lp
+	add ax, [edi + 2*esi]		; loop body : add current array element to the sum
+	inc esi						; step		: increament loop counter
+cond: cmp esi, [ebp+12]			; condition : compare loop counter with the length of the array
+	  jl lp						; condition : continue iteration if counter is less than length of array 
 
-	movsx eax,ax
-	cdq
-	idiv SDWORD PTR [ebp+12]
+	; division : we select the 32-bit version of the idiv instruction i.e. the
+	; one that takes a 32-bit divisor as operand. Thus we will need to use the 
+	; EDX:EAX combination to store the divident
+	movsx eax,ax				; we sign extend the ax into eax register 
+	cdq							; we sign extend the eax into the edx register
+	idiv SDWORD PTR [ebp+12]	; we execute the 32-bit version of idiv instruction
 
-	mov edi, [ebp+16]
-	mov [edi],eax
+	; return mean into the pass by reference parameter
+	mov edi, [ebp+16]			; store the address of the pass by reference variable into edi
+	mov [edi],eax				; store the mean value into the address of the pass by reference parameter 
 
 	;epilogue
 	pop esi
