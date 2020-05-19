@@ -35,7 +35,36 @@ variancemessage BYTE "Variance : ",0
 
 .code
 mean PROC
-ret
+	;prologue
+	push ebp
+	mov ebp,esp
+	push edi
+	push esi
+
+	;int Mean( int *array, int size, int *mean)
+	mov edi, [ebp+8]
+	mov esi, 0
+	mov eax, 0
+	jmp cond
+lp: 
+	add ax, [edi + 2*esi]
+	inc esi
+cond: cmp esi, [ebp+12]
+	  jl lp
+
+	movsx eax,ax
+	cdq
+	idiv SDWORD PTR [ebp+12]
+
+	mov edi, [ebp+16]
+	mov [edi],eax
+
+	;epilogue
+	pop esi
+	pop edi
+	mov esp,ebp
+	pop ebp
+	ret 12
 mean ENDP
 
 variance PROC
