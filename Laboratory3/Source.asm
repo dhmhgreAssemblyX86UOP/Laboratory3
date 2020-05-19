@@ -72,7 +72,41 @@ cond: cmp esi, [ebp+12]			; condition : compare loop counter with the length of 
 mean ENDP
 
 variance PROC
-ret
+	push ebp
+	mov ebp,esp
+	push edi
+	push esi
+	push ebx
+	push edx
+
+	;int Variance(int *array, int size, int mean,int *variance)
+	mov edi, [ebp+8]
+	mov esi, 0
+	mov eax, 0			
+	mov ebx, [ebp+16]
+	jmp cond
+lp:
+	movsx edx, SWORD PTR [edi+esi*2]
+	sub edx,ebx
+	imul edx,edx
+	add eax,edx
+	inc esi
+cond : cmp esi, [ebp+12]
+		jl lp
+
+	cdq
+	idiv SDWORD PTR [ebp+12]
+
+	mov edi,[ebp+20]
+	mov [edi], eax
+
+	pop edx
+	pop ebx
+	pop esi
+	pop edi
+	mov esp,ebp
+	pop ebp
+	ret	16
 variance ENDP
 
 main PROC
