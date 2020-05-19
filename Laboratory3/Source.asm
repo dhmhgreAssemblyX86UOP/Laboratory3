@@ -43,6 +43,7 @@ ret
 variance ENDP
 
 main PROC
+	; prologue
 	push ebp
 	mov ebp,esp
 	sub esp,8
@@ -50,13 +51,14 @@ main PROC
 	mov [ebp-8], DWORD PTR 0	; initialize v local variable
 
 	;int Mean( int *array, int size, int *mean)
-	lea edi, [ebp-4]
-	push edi
-	push LENGTHOF array
-	push OFFSET array
-	call mean
+	lea edi, [ebp-4]			; store the m variable address into edi
+	push edi					; push the m variable's address into the stack frame
+	push LENGTHOF array			; push the length of the array into the stack frame
+	push OFFSET array			; push the address of the array into the stack frame
+	call mean					; call mean function 
 
-	mov edx, OFFSET meanmessage
+	; print the result to the screen
+	mov edx, OFFSET meanmessage 
 	call WriteString
 	call WriteInt
 	call Crlf
@@ -65,14 +67,15 @@ main PROC
 	;mov eax,...
 	;int Variance(int *array, int size, int mean,int *variance)
 
-	lea edi, [ebp-8]
-	push edi
+	lea edi, [ebp-8]			; store the v variable address into edi
+	push edi					; push the v variable's address into the stack frame
 	;push eax
-	push SDWORD PTR [ebp-4]
-	push LENGTHOF array
-	push OFFSET array
-	call variance
+	push SDWORD PTR [ebp-4]		; push the m variable's value into the stack frame
+	push LENGTHOF array			; push the length of the array into the stack frame
+	push OFFSET array			; push the address of the array into the stack frame
+	call variance				; call variance function
 
+	; print the result to the screen
 	mov edx, OFFSET variancemessage
 	call WriteString
 	call WriteInt
